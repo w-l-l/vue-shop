@@ -11,15 +11,15 @@
         class="login_form"
         :rules="loginRules"
       >
-        <el-form-item prop="user">
+        <el-form-item prop="username">
           <el-input
-            v-model="loginForm.user"
+            v-model="loginForm.username"
             prefix-icon="iconfont icon-user"
           ></el-input>
         </el-form-item>
-        <el-form-item prop="pwd">
+        <el-form-item prop="password">
           <el-input
-            v-model="loginForm.pwd"
+            v-model="loginForm.password"
             prefix-icon="iconfont icon-3702mima"
             type="password"
           ></el-input>
@@ -37,11 +37,11 @@ export default {
   data() {
     return {
       loginForm: {
-        user: 'admin',
-        pwd: '123456',
+        username: 'admin',
+        password: '123456',
       },
       loginRules: {
-        user: [
+        username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           {
             min: 3,
@@ -50,7 +50,7 @@ export default {
             trigger: 'blur',
           },
         ],
-        pwd: [
+        password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           {
             min: 6,
@@ -67,9 +67,16 @@ export default {
       this.$refs.logFormRef.resetFields()
     },
     login() {
-      this.$refs.logFormRef.validate((valid) => {
+      this.$refs.logFormRef.validate(async (valid) => {
         if (!valid) return
-        console.log(111)
+        const { data } = await this.$axios.post('login', this.loginForm)
+        if (data.meta.status === 200) {
+          this.$message.success('登录成功')
+          window.sessionStorage.setItem('token', data.data.token)
+          this.$router.push('/home')
+        } else {
+          this.$message.error('登录失败')
+        }
       })
     },
   },

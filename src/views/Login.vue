@@ -70,13 +70,10 @@ export default {
       this.$refs.logFormRef.validate(async (valid) => {
         if (!valid) return
         const { data } = await this.$axios.post('login', this.loginForm)
-        if (data.meta.status === 200) {
-          this.$message.success('登录成功')
-          window.sessionStorage.setItem('token', data.data.token)
-          this.$router.push('/home')
-        } else {
-          this.$message.error('登录失败')
-        }
+        if (data.meta.status !== 200) return this.$message.error('登录失败')
+        this.$message.success('登录成功')
+        window.sessionStorage.setItem('token', data.data.token)
+        this.$router.push('/home')
       })
     },
   },

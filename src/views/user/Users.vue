@@ -291,6 +291,7 @@ export default {
     },
     closeEditDialog() {
       this.$refs.editInfoRef.resetFields()
+      this.userInfo = {}
     },
     edituser() {
       this.$refs.editInfoRef.validate(async (valid) => {

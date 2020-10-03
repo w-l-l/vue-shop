@@ -294,7 +294,7 @@ export default {
           type: 'warning',
         }
       ).catch((err) => err)
-      if (confirm === 'cancel') return this.$message.info('已取消删除')
+      if (confirm !== 'confirm') return this.$message.info('已取消删除')
       const { data } = await this.$axios.delete(`roles/${id}`)
       if (data.meta.status !== 200) return this.$message.error('删除角色失败')
       this.$message.success('删除角色成功')

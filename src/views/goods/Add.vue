@@ -41,7 +41,7 @@
             <el-form-item label="商品价格" prop="goods_price">
               <el-input-number
                 v-model="addGoodForm.goods_price"
-                :min="0"
+                :min="1"
                 :precision="2"
                 @change="numberChange('goods_price')"
               ></el-input-number>
@@ -57,7 +57,7 @@
             <el-form-item label="商品数量" prop="goods_number">
               <el-input-number
                 v-model="addGoodForm.goods_number"
-                :min="0"
+                :min="1"
                 :precision="0"
                 @change="numberChange('goods_number')"
               ></el-input-number>
@@ -110,7 +110,12 @@
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
-          <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+          <el-tab-pane label="商品内容" name="4">
+            <quill-editor v-model="addGoodForm.goods_introduce"></quill-editor>
+            <el-button type="primary" class="add_good_btn" @click="addGood"
+              >添加商品</el-button
+            >
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
@@ -121,6 +126,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 export default {
   data() {
     return {
@@ -134,12 +140,13 @@ export default {
       },
       addGoodForm: {
         goods_name: '',
-        goods_price: 0,
+        goods_price: 1,
         goods_weight: 0,
-        goods_number: 0,
+        goods_number: 1,
         goods_cat: [],
         attrs: [],
         pics: [],
+        goods_introduce: '',
       },
       addGoodFormRule: {
         goods_name: [
@@ -211,7 +218,10 @@ export default {
         }
         callback(data.data)
       }
-      if (this.activeStep === '1') {
+      if (
+        this.activeStep === '1' &&
+        (!this.manyList.length || this.cateId !== this.manyList[0].cat_id)
+      ) {
         getAttrFn('many', '参数', (data) => {
           data.forEach((item) => {
             item.attr_vals = item.attr_vals ? item.attr_vals.split(',') : []
@@ -219,7 +229,10 @@ export default {
           })
           this.manyList = data
         })
-      } else if (this.activeStep === '2') {
+      } else if (
+        this.activeStep === '2' &&
+        (!this.onlyList.length || this.cateId !== this.onlyList[0].cat_id)
+      ) {
         getAttrFn('only', '属性', (data) => (this.onlyList = data))
       }
     },
@@ -237,6 +250,29 @@ export default {
       this.previewDialog = true
       this.previewUrl = info.response.data.url
     },
+    addGood() {
+      this.$refs.addGoodFormRef.validate(async (valid) => {
+        if (!valid) return this.$message.error('请填写必要的表单项！')
+        const addGoodForm = _.cloneDeep(this.addGoodForm)
+        addGoodForm.goods_cat = addGoodForm.goods_cat.join()
+        this.manyList.forEach((item) => {
+          addGoodForm.attrs.push({
+            attr_id: item.attr_id,
+            attr_value: item.attr_checkbox.join(),
+          })
+        })
+        this.onlyList.forEach((item) => {
+          addGoodForm.attrs.push({
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals,
+          })
+        })
+        const { data } = await this.$axios.post('goods', addGoodForm)
+        if (data.meta.status !== 201) return this.$message.error('添加商品失败')
+        this.$message.success('添加商品成功')
+        this.$router.push('/goods')
+      })
+    },
   },
 }
 </script>
@@ -247,5 +283,8 @@ export default {
 }
 .img_preview {
   width: 100%;
+}
+.add_good_btn {
+  margin-top: 15px;
 }
 </style>

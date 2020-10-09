@@ -217,6 +217,7 @@ export default {
       this.editSiteDialog = true
     },
     site1Change(arr) {
+      if (!arr) return
       arr.length && this.$refs.editSiteRef.clearValidate('site1')
     },
     numberChange(msg) {
@@ -224,7 +225,7 @@ export default {
     },
     closeEditSiteDialog() {
       this.$refs.editSiteRef.resetFields()
-      this.editSiteForm.site1 = []
+      this.editSiteForm = {}
     },
     editSite() {
       this.$refs.editSiteRef.validate(async (valid) => {

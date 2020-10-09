@@ -12,11 +12,12 @@ import Params from '../views/goods/Params.vue'
 import Goods from '../views/goods/Goods.vue'
 import Add from '../views/goods/Add.vue'
 import Order from '../views/order/Order.vue'
+import Report from '../views/report/Report.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', redirect: '/login' },
+  { path: '/', redirect: () => window.sessionStorage.getItem('token') ? window.sessionStorage.getItem('activePath') || '/welcome' : '/login' },
   { path: '/login', component: Login },
   {
     path: '/home',
@@ -31,7 +32,9 @@ const routes = [
       { path: '/params', component: Params },
       { path: '/goods', component: Goods },
       { path: '/goods/add', component: Add },
-      { path: '/orders', component: Order }
+      { path: '/goods/edit/:id', component: Add },
+      { path: '/orders', component: Order },
+      { path: '/reports', component: Report }
     ]
   }
 ]

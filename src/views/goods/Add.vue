@@ -3,11 +3,11 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>商品管理</el-breadcrumb-item>
-      <el-breadcrumb-item>添加商品</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ titleText }}商品</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
       <el-alert
-        title="添加商品信息"
+        :title="`${titleText}商品信息`"
         type="info"
         center
         show-icon
@@ -105,6 +105,7 @@
               :on-remove="imgRemove"
               :on-preview="imgPreview"
               list-type="picture"
+              :file-list="fileList"
               :headers="imgUploadUrlHeader"
             >
               <el-button size="small" type="primary">点击上传</el-button>
@@ -112,8 +113,8 @@
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
             <quill-editor v-model="addGoodForm.goods_introduce"></quill-editor>
-            <el-button type="primary" class="add_good_btn" @click="addGood"
-              >添加商品</el-button
+            <el-button type="primary" class="add_good_btn" @click="addEditGood"
+              >{{ titleText }}商品</el-button
             >
           </el-tab-pane>
         </el-tabs>
@@ -171,19 +172,62 @@ export default {
       imgUploadUrlHeader: {
         Authorization: window.sessionStorage.getItem('token'),
       },
+      fileList: [],
       previewDialog: false,
       previewUrl: '',
     }
   },
   created() {
     this.getCateList()
+    if (this.goodId) this.getGoodInfo()
   },
   computed: {
     cateId() {
       return this.addGoodForm.goods_cat[2] || null
     },
+    titleText() {
+      return this.goodId ? '修改' : '添加'
+    },
+    goodId() {
+      return this.$route.params.id
+    },
+  },
+  watch: {
+    goodId() {
+      this.getGoodInfo()
+    },
   },
   methods: {
+    async getGoodInfo() {
+      const { data } = await this.$axios.get(`goods/${this.goodId}`)
+      if (data.meta.status !== 200) {
+        return this.$message.error('商品信息获取失败')
+      }
+      const info = data.data
+      info.goods_cat = info.goods_cat.split(',').map((item) => item >> 0)
+      const manyList = {}
+      const onlyList = []
+      info.attrs.forEach((item) => {
+        if (item.attr_sel === 'many') {
+          item.attr_value = item.attr_value ? item.attr_value.split(',') : []
+          manyList[item.attr_id] = item
+        } else if (item.attr_sel === 'only') {
+          item.attr_vals = item.attr_value
+          onlyList.push(item)
+        }
+      })
+      info.manyList = manyList
+      info.onlyList = onlyList
+      info.pics.forEach((item) => {
+        this.fileList.push({
+          picId: item.pics_id,
+          name: item.pics_big_url.slice(-10),
+          url: item.pics_big_url,
+        })
+        this.addGoodForm.pics.push(item)
+      })
+      this.addGoodForm = info
+    },
     async getCateList() {
       const { data } = await this.$axios.get('categories')
       if (data.meta.status !== 200) {
@@ -225,7 +269,9 @@ export default {
         getAttrFn('many', '参数', (data) => {
           data.forEach((item) => {
             item.attr_vals = item.attr_vals ? item.attr_vals.split(',') : []
-            item.attr_checkbox = item.attr_vals.slice()
+            item.attr_checkbox = this.goodId
+              ? this.addGoodForm.manyList[item.attr_id]?.attr_value || []
+              : [...item.attr_vals]
           })
           this.manyList = data
         })
@@ -233,43 +279,98 @@ export default {
         this.activeStep === '2' &&
         (!this.onlyList.length || this.cateId !== this.onlyList[0].cat_id)
       ) {
-        getAttrFn('only', '属性', (data) => (this.onlyList = data))
+        getAttrFn(
+          'only',
+          '属性',
+          (data) =>
+            (this.onlyList =
+              data[0].cat_id === this.addGoodForm.cat_id &&
+              this.addGoodForm.onlyList.length
+                ? this.addGoodForm.onlyList
+                : data)
+        )
       }
     },
     imgSuccess(info) {
       this.addGoodForm.pics.push({ pic: info.data.tmp_path })
     },
     imgRemove(info) {
-      const removePath = info.response.data.tmp_path
+      const removePath = info.picId || info.response.data.tmp_path
       const index = this.addGoodForm.pics.findIndex(
-        (item) => item.pic === removePath
+        (item) => item.pic || item.pics_id === removePath
       )
       this.addGoodForm.pics.splice(index, 1)
     },
     imgPreview(info) {
+      console.log(info)
       this.previewDialog = true
-      this.previewUrl = info.response.data.url
+      this.previewUrl = info.picId ? info.url : info.response.data.url
     },
-    addGood() {
+    addGood(form) {
+      this.manyList.forEach((item) => {
+        form.attrs.push({
+          attr_id: item.attr_id,
+          attr_value: item.attr_checkbox.join(),
+        })
+      })
+      this.onlyList.forEach((item) => {
+        form.attrs.push({
+          attr_id: item.attr_id,
+          attr_value: item.attr_vals,
+        })
+      })
+    },
+    editGood(form) {
+      const manyList = []
+      const onlyList = []
+      let manyArr = []
+      let masnyAttr = 'attr_checkbox'
+      if (this.manyList.length) {
+        manyArr = this.manyList
+      } else {
+        manyArr = Object.values(form.manyList)
+        masnyAttr = 'attr_value'
+      }
+      manyArr.forEach((item) => {
+        manyList.push({
+          attr_id: item.attr_id,
+          attr_value: item[masnyAttr].join(),
+        })
+      })
+      delete form.manyList
+      ;[...(this.onlyList.length ? this.onlyList : form.onlyList)].forEach(
+        (item) => {
+          onlyList.push({
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals,
+          })
+        }
+      )
+      delete form.onlyList
+      form.attrs = [...manyList, ...onlyList]
+    },
+    addEditGood() {
       this.$refs.addGoodFormRef.validate(async (valid) => {
         if (!valid) return this.$message.error('请填写必要的表单项！')
         const addGoodForm = _.cloneDeep(this.addGoodForm)
         addGoodForm.goods_cat = addGoodForm.goods_cat.join()
-        this.manyList.forEach((item) => {
-          addGoodForm.attrs.push({
-            attr_id: item.attr_id,
-            attr_value: item.attr_checkbox.join(),
-          })
-        })
-        this.onlyList.forEach((item) => {
-          addGoodForm.attrs.push({
-            attr_id: item.attr_id,
-            attr_value: item.attr_vals,
-          })
-        })
-        const { data } = await this.$axios.post('goods', addGoodForm)
-        if (data.meta.status !== 201) return this.$message.error('添加商品失败')
-        this.$message.success('添加商品成功')
+        let res = 'post'
+        let url = 'goods'
+        let status = 201
+        if (this.goodId) {
+          res = 'put'
+          url += `/${this.goodId}`
+          status = 200
+          this.editGood(addGoodForm)
+        } else {
+          this.addGood(addGoodForm)
+        }
+        const { data } = await this.$axios[res](url, addGoodForm)
+        const msg = `${this.titleText}商品`
+        if (data.meta.status !== status) {
+          return this.$message.error(`${msg}失败`)
+        }
+        this.$message.success(`${msg}成功`)
         this.$router.push('/goods')
       })
     },

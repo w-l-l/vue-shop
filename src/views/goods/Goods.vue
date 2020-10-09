@@ -53,6 +53,7 @@
               type="primary"
               size="mini"
               icon="el-icon-edit"
+              @click="editGood(scope.row.goods_id)"
             ></el-button>
             <el-button
               type="danger"
@@ -130,6 +131,9 @@ export default {
     },
     addGoodUrl() {
       this.$router.push('/goods/add')
+    },
+    editGood(id) {
+      this.$router.push(`/goods/edit/${id}`)
     },
   },
 }

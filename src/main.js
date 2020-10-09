@@ -10,6 +10,9 @@ import './assets/css/common.css'
 // 字体图标
 import './assets/fonts/iconfont.css'
 
+// nprogress进度条样式
+import 'nprogress/nprogress.css'
+
 // 树形表格
 import treeTable from 'vue-table-with-tree-grid'
 

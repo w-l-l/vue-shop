@@ -41,7 +41,9 @@ import {
   Timeline,
   TimelineItem,
   RadioGroup,
-  Radio
+  Radio,
+  Backtop,
+  Icon
 } from 'element-ui'
 
 Vue.use(Button)
@@ -84,5 +86,7 @@ Vue.use(Timeline)
 Vue.use(TimelineItem)
 Vue.use(RadioGroup)
 Vue.use(Radio)
+Vue.use(Backtop)
+Vue.use(Icon)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm

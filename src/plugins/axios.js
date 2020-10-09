@@ -2,6 +2,7 @@
 
 import Vue from 'vue'
 import axios from 'axios'
+import NProgress from 'nprogress'
 
 // Full config:  https://github.com/axios/axios#request-config
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
@@ -18,6 +19,7 @@ const _axios = axios.create(config)
 
 _axios.interceptors.request.use(
   function (config) {
+    NProgress.start()
     config.headers.Authorization = window.sessionStorage.getItem('token')
     return config
   },
@@ -31,6 +33,7 @@ _axios.interceptors.request.use(
 _axios.interceptors.response.use(
   function (response) {
     // Do something with response data
+    NProgress.done()
     return response
   },
   function (error) {

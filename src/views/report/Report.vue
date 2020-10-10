@@ -17,34 +17,34 @@ export default {
     return {
       options: {
         title: {
-          text: '用户来源',
+          text: '用户来源'
         },
         tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'cross',
             label: {
-              backgroundColor: '#E9EEF3',
-            },
-          },
+              backgroundColor: '#E9EEF3'
+            }
+          }
         },
         grid: {
           left: '3%',
           right: '4%',
           bottom: '3%',
-          containLabel: true,
+          containLabel: true
         },
         xAxis: [
           {
-            boundaryGap: false,
-          },
+            boundaryGap: false
+          }
         ],
         yAxis: [
           {
-            type: 'value',
-          },
-        ],
-      },
+            type: 'value'
+          }
+        ]
+      }
     }
   },
   async mounted() {
@@ -59,11 +59,9 @@ export default {
   methods: {
     async getReportInfo() {
       const { data } = await this.$axios.get('reports/type/1')
-      return data.meta.status === 200
-        ? data.data
-        : this.$message.error('获取折线图数据失败')
-    },
-  },
+      return data.meta.status === 200 ? data.data : this.$message.error('获取折线图数据失败')
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

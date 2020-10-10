@@ -12,9 +12,7 @@
         <el-table-column prop="path" label="路径"></el-table-column>
         <el-table-column label="权限等级">
           <template slot-scope="scope">
-            <el-tag :type="['', 'success', 'warning'][scope.row.level]"
-              >{{ ['一', '二', '三'][scope.row.level] }}级</el-tag
-            >
+            <el-tag :type="['', 'success', 'warning'][scope.row.level]">{{ ['一', '二', '三'][scope.row.level] }}级</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -26,7 +24,7 @@
 export default {
   data() {
     return {
-      rightList: [],
+      rightList: []
     }
   },
   created() {
@@ -39,7 +37,7 @@ export default {
         return this.$message.error('权限列表获取失败')
       }
       this.rightList = data.data
-    },
-  },
+    }
+  }
 }
 </script>

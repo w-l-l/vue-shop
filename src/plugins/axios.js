@@ -55,7 +55,7 @@ Plugin.install = function (Vue, options) {
       get() {
         return _axios
       }
-    },
+    }
   })
 }
 

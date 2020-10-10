@@ -8,63 +8,30 @@
     <el-card>
       <el-row>
         <el-col :span="8">
-          <el-input
-            placeholder="请输入订单编号关键字"
-            v-model="queryInfo.query"
-            clearable
-            @clear="getOrderList"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getOrderList"
-            ></el-button>
+          <el-input placeholder="请输入订单编号关键字" v-model="queryInfo.query" clearable @clear="getOrderList">
+            <el-button slot="append" icon="el-icon-search" @click="getOrderList"></el-button>
           </el-input>
         </el-col>
       </el-row>
       <el-table :data="orderList" border stripe>
         <el-table-column type="index" label="#">
-          <template slot-scope="scope">{{
-            (queryInfo.pagenum - 1) * queryInfo.pagesize + scope.$index + 1
-          }}</template>
+          <template slot-scope="scope">{{ (queryInfo.pagenum - 1) * queryInfo.pagesize + scope.$index + 1 }}</template>
         </el-table-column>
         <el-table-column prop="order_number" label="订单编号"></el-table-column>
-        <el-table-column
-          prop="order_price"
-          label="订单价格"
-          width="100"
-        ></el-table-column>
+        <el-table-column prop="order_price" label="订单价格" width="100"></el-table-column>
         <el-table-column label="是否付款" width="100">
           <template slot-scope="scope">
-            <el-tag :type="['danger', 'success'][scope.row.pay_status]"
-              >{{ ['未', '已'][scope.row.pay_status] }}付款</el-tag
-            >
+            <el-tag :type="['danger', 'success'][scope.row.pay_status]">{{ ['未', '已'][scope.row.pay_status] }}付款</el-tag>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="is_send"
-          label="是否发货"
-          width="100"
-        ></el-table-column>
+        <el-table-column prop="is_send" label="是否发货" width="100"></el-table-column>
         <el-table-column label="下架时间" width="200">
-          <template slot-scope="scope">{{
-            scope.row.create_time | dateFormat
-          }}</template>
+          <template slot-scope="scope">{{ scope.row.create_time | dateFormat }}</template>
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template slot-scope="scope">
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              @click="showEditSiteDialog(scope.row.order_id)"
-            ></el-button>
-            <el-button
-              type="success"
-              size="mini"
-              icon="el-icon-location"
-              @click="showProgressDialog"
-            ></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="showEditSiteDialog(scope.row.order_id)"></el-button>
+            <el-button type="success" size="mini" icon="el-icon-location" @click="showProgressDialog"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -79,28 +46,13 @@
       >
       </el-pagination>
     </el-card>
-    <el-dialog
-      title="修改订单"
-      :visible.sync="editSiteDialog"
-      width="50%"
-      @close="closeEditSiteDialog"
-    >
-      <el-form
-        :model="editSiteForm"
-        :rules="editSiteRule"
-        ref="editSiteRef"
-        label-width="90px"
-      >
+    <el-dialog title="修改订单" :visible.sync="editSiteDialog" width="50%" @close="closeEditSiteDialog">
+      <el-form :model="editSiteForm" :rules="editSiteRule" ref="editSiteRef" label-width="90px">
         <el-form-item label="订单编号">
           <el-input v-model="editSiteForm.order_number" disabled></el-input>
         </el-form-item>
         <el-form-item label="订单价格" prop="order_price">
-          <el-input-number
-            v-model="editSiteForm.order_price"
-            :min="1"
-            :precision="2"
-            @change="numberChange('order_price')"
-          ></el-input-number>
+          <el-input-number v-model="editSiteForm.order_price" :min="1" :precision="2" @change="numberChange('order_price')"></el-input-number>
         </el-form-item>
         <el-form-item label="支付方式" prop="order_pay">
           <el-radio-group v-model="editSiteForm.order_pay">
@@ -111,23 +63,10 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否发货">
-          <el-switch
-            v-model="editSiteForm.is_send"
-            active-value="是"
-            active-text="是"
-            inactive-value="否"
-            inactive-text="否"
-          >
-          </el-switch>
+          <el-switch v-model="editSiteForm.is_send" active-value="是" active-text="是" inactive-value="否" inactive-text="否"> </el-switch>
         </el-form-item>
         <el-form-item label="省市区/县" prop="site1">
-          <el-cascader
-            v-model="editSiteForm.site1"
-            :options="cityData"
-            :props="{ expandTrigger: 'hover' }"
-            @change="site1Change"
-            clearable
-          ></el-cascader>
+          <el-cascader v-model="editSiteForm.site1" :options="cityData" :props="{ expandTrigger: 'hover' }" @change="site1Change" clearable></el-cascader>
         </el-form-item>
         <el-form-item label="详细地址" prop="site2">
           <el-input v-model="editSiteForm.site2"></el-input>
@@ -140,11 +79,7 @@
     </el-dialog>
     <el-dialog title="物流进度" :visible.sync="progressDialog" width="50%">
       <el-timeline>
-        <el-timeline-item
-          v-for="(item, index) in progressList"
-          :key="index"
-          :timestamp="item.time"
-        >
+        <el-timeline-item v-for="(item, index) in progressList" :key="index" :timestamp="item.time">
           {{ item.context }}
         </el-timeline-item>
       </el-timeline>
@@ -161,7 +96,7 @@ export default {
       queryInfo: {
         query: '',
         pagenum: 1,
-        pagesize: 5,
+        pagesize: 5
       },
       total: 0,
       editSiteDialog: false,
@@ -169,16 +104,12 @@ export default {
       editSiteRule: {
         site1: [{ required: true, message: '请选择省市区县', trigger: 'blur' }],
         site2: [{ required: true, message: '请填写详细地址', trigger: 'blur' }],
-        order_price: [
-          { required: true, message: '订单价格不能为空', trigger: 'blur' },
-        ],
-        order_pay: [
-          { required: true, message: '请选择支付方式', trigger: 'blur' },
-        ],
+        order_price: [{ required: true, message: '订单价格不能为空', trigger: 'blur' }],
+        order_pay: [{ required: true, message: '请选择支付方式', trigger: 'blur' }]
       },
       cityData,
       progressDialog: false,
-      progressList: [],
+      progressList: []
     }
   },
   created() {
@@ -187,7 +118,7 @@ export default {
   methods: {
     async getOrderList() {
       const { data } = await this.$axios.get('orders', {
-        params: this.queryInfo,
+        params: this.queryInfo
       })
       if (data.meta.status !== 200) {
         return this.$message.error('订单列表获取失败')
@@ -208,9 +139,7 @@ export default {
       if (data.meta.status !== 200) {
         return this.$message.error('订单信息获取失败')
       }
-      const site = data.data.consignee_addr
-        ? data.data.consignee_addr.split(',')
-        : []
+      const site = data.data.consignee_addr ? data.data.consignee_addr.split(',') : []
       data.data.site2 = site.pop() || ''
       data.data.site1 = site
       this.editSiteForm = data.data
@@ -228,7 +157,7 @@ export default {
       this.editSiteForm = {}
     },
     editSite() {
-      this.$refs.editSiteRef.validate(async (valid) => {
+      this.$refs.editSiteRef.validate(async valid => {
         if (!valid) return
         const editSiteForm = _.cloneDeep(this.editSiteForm)
         const { site1, site2 } = editSiteForm
@@ -237,10 +166,7 @@ export default {
         editSiteForm.pay_status = editSiteForm.order_pay === '0' ? '0' : '1'
         delete editSiteForm.site1
         delete editSiteForm.site2
-        const { data } = await this.$axios.put(
-          `orders/${editSiteForm.order_id}`,
-          editSiteForm
-        )
+        const { data } = await this.$axios.put(`orders/${editSiteForm.order_id}`, editSiteForm)
         if (data.meta.status !== 201) return this.$message.error('修改订单失败')
         this.$message.success('修改订单成功')
         this.editSiteDialog = false
@@ -254,8 +180,8 @@ export default {
       }
       this.progressList = data.data
       this.progressDialog = true
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

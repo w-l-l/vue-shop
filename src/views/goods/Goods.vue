@@ -8,17 +8,8 @@
     <el-card>
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input
-            placeholder="请输入商品名称关键字"
-            v-model="queryInfo.query"
-            clearable
-            @clear="getGoodList"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getGoodList"
-            ></el-button>
+          <el-input placeholder="请输入商品名称关键字" v-model="queryInfo.query" clearable @clear="getGoodList">
+            <el-button slot="append" icon="el-icon-search" @click="getGoodList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -27,21 +18,11 @@
       </el-row>
       <el-table :data="goodList" border stripe>
         <el-table-column type="index" label="#">
-          <template slot-scope="scope">{{
-            (queryInfo.pagenum - 1) * queryInfo.pagesize + scope.$index + 1
-          }}</template>
+          <template slot-scope="scope">{{ (queryInfo.pagenum - 1) * queryInfo.pagesize + scope.$index + 1 }}</template>
         </el-table-column>
         <el-table-column prop="goods_name" label="商品名称"></el-table-column>
-        <el-table-column
-          prop="goods_price"
-          label="商品价格(元)"
-          width="95"
-        ></el-table-column>
-        <el-table-column
-          prop="goods_weight"
-          label="商品重量"
-          width="70"
-        ></el-table-column>
+        <el-table-column prop="goods_price" label="商品价格(元)" width="95"></el-table-column>
+        <el-table-column prop="goods_weight" label="商品重量" width="70"></el-table-column>
         <el-table-column label="创建时间" width="140">
           <template slot-scope="scope">
             {{ scope.row.add_time | dateFormat }}
@@ -49,18 +30,8 @@
         </el-table-column>
         <el-table-column label="操作" width="130">
           <template slot-scope="scope">
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              @click="editGood(scope.row.goods_id)"
-            ></el-button>
-            <el-button
-              type="danger"
-              size="mini"
-              icon="el-icon-delete"
-              @click="delGood(scope.row.goods_id)"
-            ></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="editGood(scope.row.goods_id)"></el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="delGood(scope.row.goods_id)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -87,8 +58,8 @@ export default {
       queryInfo: {
         query: '',
         pagenum: 1,
-        pagesize: 5,
-      },
+        pagesize: 5
+      }
     }
   },
   created() {
@@ -97,7 +68,7 @@ export default {
   methods: {
     async getGoodList() {
       const { data } = await this.$axios.get('goods', {
-        params: this.queryInfo,
+        params: this.queryInfo
       })
       if (data.meta.status !== 200) {
         return this.$message.error('商品列表获取失败')
@@ -114,15 +85,11 @@ export default {
       this.getGoodList()
     },
     async delGood(id) {
-      const confirm = await this.$confirm(
-        '此操作将永久删除该分类, 是否继续?',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }
-      ).catch((err) => err)
+      const confirm = await this.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
       if (confirm !== 'confirm') return this.$message.info('已取消删除')
       const { data } = await this.$axios.delete(`goods/${id}`)
       if (data.meta.status !== 200) this.$message.error('删除商品失败')
@@ -134,8 +101,8 @@ export default {
     },
     editGood(id) {
       this.$router.push(`/goods/edit/${id}`)
-    },
-  },
+    }
+  }
 }
 </script>
 

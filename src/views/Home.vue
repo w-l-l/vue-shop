@@ -10,31 +10,13 @@
     <el-container>
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="collapse">|||</div>
-        <el-menu
-          :default-active="activePath"
-          background-color="#333744"
-          text-color="#fff"
-          active-text-color="#409EFF"
-          unique-opened
-          :collapse="isCollapse"
-          :collapse-transition="false"
-          router
-        >
-          <el-submenu
-            :index="'/' + item.path"
-            v-for="item in menuList"
-            :key="item.id"
-          >
+        <el-menu :default-active="activePath" background-color="#333744" text-color="#fff" active-text-color="#409EFF" unique-opened :collapse="isCollapse" :collapse-transition="false" router>
+          <el-submenu :index="'/' + item.path" v-for="item in menuList" :key="item.id">
             <template slot="title">
               <i :class="iconObj[item.id]"></i>
               <span>{{ item.authName }}</span>
             </template>
-            <el-menu-item
-              :index="'/' + item.path"
-              v-for="item in item.children"
-              :key="item.id"
-              @click="saveActivePath(item.path)"
-            >
+            <el-menu-item :index="'/' + item.path" v-for="item in item.children" :key="item.id" @click="saveActivePath(item.path)">
               <template slot="title">
                 <i class="el-icon-menu"></i>
                 <span>{{ item.authName }}</span>
@@ -59,10 +41,10 @@ export default {
         103: 'iconfont icon-tijikongjian',
         101: 'iconfont icon-shangpin',
         102: 'iconfont icon-danju',
-        145: 'iconfont icon-baobiao',
+        145: 'iconfont icon-baobiao'
       },
       isCollapse: false,
-      activePath: '',
+      activePath: ''
     }
   },
   created() {
@@ -77,21 +59,16 @@ export default {
     },
     async getMenuList() {
       const { data } = await this.$axios.get('menus')
-      data.meta.status === 200
-        ? (this.menuList = data.data)
-        : this.$message.error(data.meta.msg)
+      data.meta.status === 200 ? (this.menuList = data.data) : this.$message.error(data.meta.msg)
     },
     collapse() {
       this.isCollapse = !this.isCollapse
     },
     saveActivePath(activePath) {
       activePath = `/${activePath}`
-      window.sessionStorage.setItem(
-        'activePath',
-        (this.activePath = activePath)
-      )
-    },
-  },
+      window.sessionStorage.setItem('activePath', (this.activePath = activePath))
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

@@ -1,5 +1,8 @@
 {
   "semi": false,
   "singleQuote": true,
-  "bracketSpacing": true
+  "bracketSpacing": true,
+  "printWidth":200,
+  "arrowParens": "avoid",
+  "TrailingCooma": "all"
 }

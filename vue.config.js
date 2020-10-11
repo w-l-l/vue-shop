@@ -17,10 +17,18 @@ module.exports = {
         nprogress: 'NProgress',
         'vue-quill-editor': 'VueQuillEditor'
       })
+      config.plugin('html').tap(args => {
+        args[0].isPro = true
+        return args
+      })
     })
     // 开发环境
     config.when(process.env.NODE_ENV === 'development', config => {
       config.entry('app').clear().add(resolve('./src/main-dev.js'))
+      config.plugin('html').tap(args => {
+        args[0].isPro = false
+        return args
+      })
     })
   }
 }
